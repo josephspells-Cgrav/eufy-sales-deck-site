@@ -5,10 +5,11 @@ import type { Product, SectionId } from "@/lib/data";
 import Section from "@/components/ui/Section";
 import TypeIn from "@/components/ui/TypeIn";
 import AnimatedUnderline from "@/components/ui/AnimatedUnderline";
+import ProductVideo from "@/components/ui/ProductVideo";
 
-// S01–S04. Static product-card section. The Higgsfield rotation video
-// lands as a polish pass — until then this is the canonical layout that
-// the rep walks the customer through.
+// S01–S04. Product card with optional rotation video. The video block
+// renders when product.videoSrc is set; otherwise the section is the
+// static layout from v1.
 
 const bulletListVariants: Variants = {
   hidden: {},
@@ -48,7 +49,14 @@ export default function ProductSection({
           Product {String(index + 1).padStart(2, "0")} of {String(total).padStart(2, "0")}
         </p>
 
-        <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-ink sm:mt-4 sm:text-4xl md:text-5xl">
+        {product.videoSrc && (
+          <ProductVideo
+            src={product.videoSrc}
+            className="mt-3 max-w-[200px] sm:mt-4 sm:max-w-[280px]"
+          />
+        )}
+
+        <h2 className={`text-balance text-3xl font-semibold tracking-tight text-ink sm:text-4xl md:text-5xl ${product.videoSrc ? "mt-4 sm:mt-5" : "mt-3 sm:mt-4"}`}>
           {product.name}
         </h2>
 

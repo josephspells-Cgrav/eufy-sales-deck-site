@@ -18,6 +18,9 @@ export type Product = {
   bullets: readonly string[];
   callout: string;
   motion: "360" | "180";
+  /** Optional rotation video. Path under /public, e.g. "/videos/solocam-e30.mp4".
+   *  When undefined, the ProductSection renders without the video block. */
+  videoSrc?: string;
 };
 
 export const PRODUCTS: readonly Product[] = [
@@ -35,6 +38,7 @@ export const PRODUCTS: readonly Product[] = [
     ],
     callout: "Replaces 3 fixed cameras with 1.",
     motion: "360",
+    videoSrc: "/videos/solocam-e30.mp4",
   },
   {
     slug: "solocam-s220",
