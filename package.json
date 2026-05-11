@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/check-no-pricing.mjs",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "check:pricing": "node scripts/check-no-pricing.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
