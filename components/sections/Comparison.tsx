@@ -6,10 +6,9 @@ import Section from "@/components/ui/Section";
 import TypeIn from "@/components/ui/TypeIn";
 import AnimatedUnderline from "@/components/ui/AnimatedUnderline";
 
-// Recipe 30 — Audit Ledger Card. The moral pivot.
-// Highest visual weight on the site. Per-row stagger driven by per-element
-// delay; whileInView avoids the hooks-in-loop trap (§1.2) entirely because
-// `whileInView` is a prop, not a hook.
+// Recipe 30 — Audit Ledger Card. The moral pivot. Highest visual weight.
+// Mobile: each row stacks (attribute on top, then eufy + other pills side-by-side).
+// sm+: classic 3-column horizontal grid.
 
 export default function Comparison() {
   return (
@@ -32,15 +31,14 @@ export default function Comparison() {
           />
         </div>
 
-        <div className="mt-10 overflow-hidden rounded-2xl bg-page ring-1 ring-border-soft shadow-[0_1px_3px_rgba(15,20,25,0.06),0_12px_32px_rgba(15,20,25,0.06)]">
-          <div className="grid grid-cols-[1.2fr_1fr_1fr] gap-3 border-b border-border-soft px-4 pb-3 pt-4 sm:gap-4 sm:px-6">
-            <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-ink-dim sm:text-xs">
-              {/* attribute column intentionally blank in header */}
-            </div>
-            <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-positive sm:text-xs">
+        <div className="mt-8 overflow-hidden rounded-2xl bg-page ring-1 ring-border-soft shadow-[0_1px_3px_rgba(15,20,25,0.06),0_12px_32px_rgba(15,20,25,0.06)] sm:mt-10">
+          {/* Column headers — desktop only */}
+          <div className="hidden gap-4 border-b border-border-soft px-6 pb-3 pt-4 sm:grid sm:grid-cols-[1.2fr_1fr_1fr]">
+            <div />
+            <div className="text-xs font-mono uppercase tracking-[0.18em] text-positive">
               eufy
             </div>
-            <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-alert sm:text-xs">
+            <div className="text-xs font-mono uppercase tracking-[0.18em] text-alert">
               The other system
             </div>
           </div>
@@ -50,22 +48,31 @@ export default function Comparison() {
               key={row.attribute}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.5 }}
+              viewport={{ once: true, amount: 0.4 }}
               transition={{
                 duration: 0.55,
                 delay: i * 0.08,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="grid grid-cols-[1.2fr_1fr_1fr] items-stretch gap-3 border-b border-border-soft px-4 py-3 last:border-0 sm:gap-4 sm:px-6 sm:py-4"
+              className="border-b border-border-soft px-4 py-4 last:border-0 sm:grid sm:grid-cols-[1.2fr_1fr_1fr] sm:items-stretch sm:gap-4 sm:px-6"
             >
-              <div className="flex items-center text-sm font-medium text-ink-muted sm:text-base">
+              <div className="text-center text-sm font-medium text-ink-muted sm:flex sm:items-center sm:text-left sm:text-base">
                 {row.attribute}
               </div>
-              <div className="flex items-center rounded-md bg-positive-tint px-3 py-2 text-sm font-semibold text-positive sm:text-base">
-                {row.eufy}
-              </div>
-              <div className="flex items-center rounded-md bg-alert-tint px-3 py-2 text-sm font-semibold text-alert sm:text-base">
-                {row.other}
+
+              <div className="mt-2 grid grid-cols-2 gap-2 sm:contents">
+                <div className="flex flex-col gap-0.5 rounded-md bg-positive-tint px-3 py-2 text-sm font-semibold text-positive sm:flex-row sm:items-center sm:gap-0 sm:text-base">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-positive/70 sm:hidden">
+                    eufy
+                  </span>
+                  <span>{row.eufy}</span>
+                </div>
+                <div className="flex flex-col gap-0.5 rounded-md bg-alert-tint px-3 py-2 text-sm font-semibold text-alert sm:flex-row sm:items-center sm:gap-0 sm:text-base">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-alert/70 sm:hidden">
+                    Other
+                  </span>
+                  <span>{row.other}</span>
+                </div>
               </div>
             </motion.div>
           ))}
