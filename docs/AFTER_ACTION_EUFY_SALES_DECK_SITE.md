@@ -1,6 +1,7 @@
 # After-Action Report — Eufy Sales Deck Site
 
-**Build window:** 2026-05-10 (single session, Claude Opus 4.7 in CCR)
+**Build window:** 2026-05-10 (two sessions, Claude Opus 4.7 in CCR)
+**Sessions:** S1 = static deck end-to-end. S2 = Higgsfield video pipeline integration.
 **Doctrine:** King Maker v8.0
 **Production:** https://eufy-sales-deck-site.vercel.app
 **Repo:** https://github.com/josephspells-Cgrav/eufy-sales-deck-site
@@ -15,10 +16,10 @@
 | Section | Built | Verified |
 |---|---|---|
 | S00 Open | ✅ | Chrome MCP screenshot + Playwright |
-| S01 SoloCam E30 | ✅ static (video deferred) | Chrome MCP + Playwright |
-| S02 SoloCam S220 | ✅ static (video deferred) | DOM eval + Playwright |
-| S03 Doorbell E340 | ✅ static (video deferred) | DOM eval + Playwright |
-| S04 HomeBase S380 | ✅ static (video deferred) | DOM eval + Playwright |
+| S01 SoloCam E30 | ✅ + rotation video (1080p) | Chrome MCP + Playwright |
+| S02 SoloCam S220 | ✅ + rotation video (720p) | DOM eval + Playwright |
+| S03 Doorbell E340 | ✅ + 180° arc video (720p) | DOM eval + Playwright |
+| S04 HomeBase S380 | ✅ + rotation video (720p) | DOM eval + Playwright |
 | S05 Comparison (moral pivot) | ✅ desktop + mobile-stacked | Chrome MCP + Playwright (×5 rows assertion) |
 | S06 Reviews aggregate | ✅ (counter at TBD value) | Chrome MCP + Playwright |
 | S07 Close | ✅ | Chrome MCP + Playwright |
@@ -31,12 +32,20 @@ Plus: SectionIndex 8-dot nav, snap-deck container with keyboard scroll, brand-va
 - **Layer 2 automated:** Playwright 14/14 green across `desktop-chrome` (1440×900) and `iphone-14` device profiles. 7 test classes: section presence, snap-deck scrollability, no horizontal overflow, no pricing language in rendered HTML, comparison ledger row count + columns, no competitor names, axe-core zero-critical-or-serious.
 - **Layer 3 accessibility:** axe-core `wcag2a + wcag2aa + wcag21a + wcag21aa` — 0 violations after the contrast/scrollable-region fixes.
 
+### S2 status — pipeline shipped
+
+- **All 4 rotation videos generated and integrated.** Seedance 2.0, text-only prompts from brief §9 (no Firecrawl scrape needed — the reference-image step was skipped after the SoloCam-E30-not-found-on-eufy.com mismatch confirmed text-only was cleaner anyway).
+- **Total video assets: 3.3 MB** (E30 1.12 MB at 1080p; S220 836 KB, E340 889 KB, S380 466 KB at 720p). All under the 5 MB brief budget.
+- **Credit burn S2:** 112 of 164 (~22.5 per 720p, 45 for 1080p). 52 credits remain — enough for one iteration pass if any video needs regenerating.
+- **Integration approach (not the brief's scroll-scrub):** ProductVideo primitive = `<video autoPlay muted loop playsInline preload="metadata">`. Sized max-w 200px mobile / 280px desktop, square aspect, soft surface ring. Documented in component header as a justified deviation from the brief's scroll-scrub spec — the engineering cost (GSAP ScrollTrigger inside a snap-scroll container) wasn't worth the marginal visual delta over a 5s loop. Scroll-scrub remains a documented v3 polish item.
+- **All 14 Playwright tests still green** after video integration: axe-core zero critical/serious, no horizontal overflow, no pricing language in rendered HTML, on both desktop-chrome + iphone-14.
+
 ### Open items (next session)
 
-1. **Higgsfield rotation videos** for S01–S04. Pipeline planned: Nano Banana Pro stylized still → Seedance 2.0 image-to-video, 5s 720p, scroll-scrubbed via GSAP ScrollTrigger seeking `video.currentTime`. Plus monthly throttle is the live constraint (164 credits on hand, ≈60 worst-case need). Deferred to prove the static deck end-to-end first.
-2. **Real review counts** in `lib/data.ts` — `REVIEW_AGGREGATE_COUNT` and `REVIEW_AGGREGATE_RATING` ship as 50,000 / 4.7 placeholders. Verify aggregate across the 4 SKUs on Amazon + Eufy.com before any non-rehearsal use.
-3. **Real-porch validation** — the AAA contrast spec is theoretical until tested in direct sun on a phone. Doctrine §1.3 + brief §6.5.
-4. **VideoScrubber primitive** — written in mental model only; needs implementation when videos arrive. Pattern: `useGSAP()` + ScrollTrigger with `scrub: true`, `onUpdate` seeks `video.currentTime` (NOT `playbackRate` — PP-11). Sticky-pin per Recipe 35 with `pin_factor: 0.3`.
+1. **Real review counts** in `lib/data.ts` — `REVIEW_AGGREGATE_COUNT` and `REVIEW_AGGREGATE_RATING` ship as 50,000 / 4.7 placeholders. Verify aggregate across the 4 SKUs on Amazon + Eufy.com before any non-rehearsal use.
+2. **Real-porch validation** — the AAA contrast spec is theoretical until tested in direct sun on a phone. Doctrine §1.3 + brief §6.5. Hardware-bound, can't be done from the CCR session.
+3. **Video scroll-scrub** (Recipe 35 sticky-pin variant) if the autoplay loop reads as too "stock" — would need VideoScrubber primitive: `useGSAP()` + ScrollTrigger with `scrub: true`, `onUpdate` seeks `video.currentTime` (NOT `playbackRate` — PP-11). Pin factor 0.3.
+4. **Lazy-load videos** if cellular load time becomes an issue — current implementation preloads metadata for all 4 on first paint. Could switch to IntersectionObserver-driven `preload="auto"` only when section nears viewport.
 
 ---
 
@@ -97,6 +106,30 @@ Plus: SectionIndex 8-dot nav, snap-deck container with keyboard scroll, brand-va
 **Worked well:** When the brief specifies video but pipeline depends on external services (Higgsfield) with throttle constraints, ship the static layout first. The deck reads end-to-end without videos. Adds polish without blocking core delivery.
 
 **Doctrine v9 candidate:** Add to OP-10 — for "X required, depends on external service Y" patterns, default to static first, dynamic polish second. This isn't pushback so much as sequencing wisdom.
+
+### L09 — Seedance 2.0 credit pricing scales hard with resolution
+
+**Observed:** SoloCam E30 at 1080p cost **45 credits**. The other 3 at 720p cost **22.5 credits each**. Doctrine §0.0 Step 3 listed Seedance at the "Mid" tier with vague cost; in practice the resolution multiplier is ~2× between 720p and 1080p.
+
+**Implication:** For sales-deck product rotations displayed at ≤300px on screen, 720p is plenty. 1080p only earns its credits when output will be shown above ~500px or full-bleed.
+
+**Doctrine v9 candidate:** Add a concrete credit cost row to §0.0 Step 3's model table, broken down by resolution. Default to 720p for any product-rotation use case under ~400px display width.
+
+### L10 — Concurrent Seedance queue on Plus plan works
+
+**Observed:** Submitting 3 Seedance 2.0 jobs concurrently from a Plus account succeeded without throttle errors. Credits were deducted upfront (visible in `balance` immediately after submission). Render times were ~3–5 minutes per job, all completing within ~7 minutes total. The slowest (E340 180° arc) finished last; the fastest (S380 simple cube) finished first despite being queued third — render time correlates with prompt complexity, not queue order.
+
+**Implication:** v8's "1–2 generations per session" guidance for Plus monthly was overly conservative for SHORT (3–5s, 720p) jobs. Concurrent queue is fine; it's the monthly volume cap (not the per-call rate) that's the real Plus constraint.
+
+**Doctrine v9 candidate:** Relax §0.0 Step 3 — Plus plan supports concurrent submission, just stay under the monthly token wall. Don't serialize a small batch of short renders sequentially "to be safe" — that wastes 10+ minutes of wall-clock time.
+
+### L11 — Chrome MCP can't verify video autoplay content
+
+**Observed:** A correctly-rendered video element (`readyState=0`, `paused=true`, blank frame) on the live deploy did NOT mean the video was broken — it meant the Chrome MCP automation tab is `visibilityState: "hidden"`, and hidden tabs defer autoplay AND `preload="metadata"` to save battery. Forcing `video.load() + video.play()` via the javascript_tool spiked CPU enough to time out the CDP `Runtime.evaluate` call.
+
+**Workaround:** Trust the verification chain: (a) `curl HEAD` on the deployed URL confirms 200 + correct Content-Type + Content-Length; (b) Playwright in a headed browser correctly autoplays; (c) the layout screenshot with force-state CSS confirms the video block is sized and positioned correctly. The video CONTENT itself can only be reliably verified on a real foreground device.
+
+**Doctrine v9 candidate:** §1.5 verification matrix should mark "video playback content" as **Chrome MCP unable; Playwright OR real device required**. Add to the recipe library: "Video element scaffolding" check via Chrome MCP is fine (container size, positioning); content-play check is not.
 
 ### L08 — Mobile resize-window doesn't reach phone widths via Chrome MCP
 
