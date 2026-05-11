@@ -13,7 +13,10 @@ export default function Home() {
   return (
     <>
       <SectionIndex />
-      <main className="snap-deck">
+      {/* tabIndex=0 makes the scroll container keyboard-focusable so
+          arrow-key scrolling works for sighted keyboard users — axe-core
+          scrollable-region-focusable rule. */}
+      <main className="snap-deck" tabIndex={0}>
         <Open />
         {PRODUCTS.map((product, i) => (
           <ProductSection

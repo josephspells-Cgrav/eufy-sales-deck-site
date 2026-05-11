@@ -16,7 +16,7 @@
 
   --text:           #0F1419;
   --text-muted:     #4A5562;
-  --text-dim:       #6E7886;
+  --text-dim:       #5C6573;   /* bumped from #6E7886 — axe AA on #F7F8FA */
 
   --brand:          #0066CC;
   --brand-deep:     #004A99;
