@@ -54,6 +54,7 @@ export const PRODUCTS: readonly Product[] = [
     ],
     callout: "4-month battery standalone. Lifetime with the sun.",
     motion: "360",
+    videoSrc: "/videos/solocam-s220.mp4",
   },
   {
     slug: "video-doorbell-e340",
@@ -69,6 +70,7 @@ export const PRODUCTS: readonly Product[] = [
     ],
     callout: "The downward camera sees what's on your porch. Most doorbells don't.",
     motion: "180",
+    videoSrc: "/videos/video-doorbell-e340.mp4",
   },
   {
     slug: "homebase-s380",
@@ -83,6 +85,7 @@ export const PRODUCTS: readonly Product[] = [
     ],
     callout: "Your footage. Your house. Your call.",
     motion: "360",
+    videoSrc: "/videos/homebase-s380.mp4",
   },
 ] as const;
 
